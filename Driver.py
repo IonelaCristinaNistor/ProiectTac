@@ -1,21 +1,17 @@
-import sys
 from antlr4 import *
 from ExprLexer import ExprLexer
 from ExprParser import ExprParser
 from ExprVisitor import ExprVisitor
 
-# Custom visitor for evaluating expressions
 class EvalVisitor(ExprVisitor):
     def visitExpr(self, ctx):
-        # Process the logical expression
         return self.visit(ctx.logicalExpr())
 
     def visitLogicalExpr(self, ctx):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.relationalExpr())
-        # Convert the children to a list
         left = self.visit(ctx.relationalExpr())
-        children = list(ctx.getChildren())  # Convert generator to a list
+        children = list(ctx.getChildren())
         for i in range(1, len(children) // 2 + 1):
             op = children[2 * i - 1].getText()
             right = self.visit(ctx.relationalExpr())
@@ -29,7 +25,7 @@ class EvalVisitor(ExprVisitor):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.additiveExpr())
         left = self.visit(ctx.additiveExpr())
-        children = list(ctx.getChildren())  # Convert generator to a list
+        children = list(ctx.getChildren())
         for i in range(1, len(children) // 2 + 1):
             op = children[2 * i - 1].getText()
             right = self.visit(ctx.additiveExpr())
@@ -48,28 +44,28 @@ class EvalVisitor(ExprVisitor):
         return left
 
     def visitAdditiveExpr(self, ctx):
-        print(f"Visiting AdditiveExpr: {ctx.getText()}")
+        print(f"Visit AdditiveExpr: {ctx.getText()}")
         if ctx.getChildCount() == 1:
             result = self.visit(ctx.multiplicativeExpr())
-            print(f"Result: {result}")
+            print(f"Rezultatul: {result}")
             return result
         left = self.visit(ctx.multiplicativeExpr(0))
         for i in range(1, len(ctx.multiplicativeExpr())):
             right = self.visit(ctx.multiplicativeExpr(i))
             op = ctx.getChild(2 * i - 1).getText()
-            print(f"Left: {left}, Right: {right}, Operator: {op}")
+            print(f"Stânga: {left}, Dreapta: {right}, Operator: {op}")
             if op == '+':
                 left = left + right
             elif op == '-':
                 left = left - right
-        print(f"Final Result: {left}")
+        print(f"Rezultatul final: {left}")
         return left
 
     def visitMultiplicativeExpr(self, ctx):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.unaryExpr())
         left = self.visit(ctx.unaryExpr())
-        children = list(ctx.getChildren())  # Convert generator to a list
+        children = list(ctx.getChildren())
         for i in range(1, len(children) // 2 + 1):
             op = children[2 * i - 1].getText()
             right = self.visit(ctx.unaryExpr())
@@ -95,24 +91,32 @@ class EvalVisitor(ExprVisitor):
 
     def visitPrimaryExpr(self, ctx):
         if ctx.NUMBER():
-            return float(ctx.NUMBER().getText())
+            result = float(ctx.NUMBER().getText())
+            print(f"PrimaryExpr NUMĂR: {ctx.getText()} => {result}")
+            return result
         elif ctx.BOOLEAN():
-            return ctx.BOOLEAN().getText() == 'true'
-        elif ctx.STRING():
-            return ctx.STRING().getText()
+            result = ctx.BOOLEAN().getText() == 'true'
+            print(f"PrimaryExpr BOOLEAN: {ctx.getText()} => {result}")
+            return result
         elif ctx.expr():
-            return self.visit(ctx.expr())
+            result = self.visit(ctx.expr())
+            print(f"PrimaryExpr expresie imbricată: {ctx.getText()} => {result}")
+            return result
+        else:
+            print(f"PrimaryExpr neprocesat: {ctx.getText()}")
+            return None
 
-# Function to evaluate an expression
+
+# Funcție pentru evaluarea unei expresii
 def evaluate_expr(expression):
     lexer = ExprLexer(InputStream(expression))
     tokens = CommonTokenStream(lexer)
     parser = ExprParser(tokens)
-    tree = parser.start_()  # Parse the start rule
+    tree = parser.start_()  # Parsează regula de start
     visitor = EvalVisitor()
     return visitor.visit(tree)
 
-# Test expressions
+# Expresii de test
 exprs = [
     "1 + 2 * (3 - 4) && true",
     "5 + 3 * 2 || false",
@@ -122,9 +126,9 @@ exprs = [
     "3 > 2 && 5 <= 6",
     "3 < 2 || 5 == 5",
     "false && 5 == 5"
+
 ]
 
-# Evaluate each expression
 for expr in exprs:
-    result = evaluate_expr(expr)
-    print(f"expr: {expr} => {result}")
+    result_expr = evaluate_expr(expr)
+    print(f"expr: {expr} => {bool(result_expr)}")

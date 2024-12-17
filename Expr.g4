@@ -4,36 +4,36 @@ start_ : expr EOF;
 
 expr : logicalExpr;
 
-logicalExpr 
-    : relationalExpr 
-    | logicalExpr ('&&' | '||') relationalExpr
+logicalExpr
+    : relationalExpr
+    | logicalExpr ('&&' | '||') relationalExpr  // Logice expr recursiv
     ;
 
-relationalExpr 
-    : additiveExpr 
+relationalExpr
+    : additiveExpr
     | relationalExpr ('==' | '!=' | '<' | '<=' | '>' | '>=') additiveExpr
     ;
 
-additiveExpr 
-    : multiplicativeExpr 
-    | additiveExpr ('+' | '-') multiplicativeExpr
+additiveExpr
+    : multiplicativeExpr
+    | additiveExpr ('+' | '-') multiplicativeExpr  // Aditiv expr recursiv
     ;
 
-multiplicativeExpr 
-    : unaryExpr 
-    | multiplicativeExpr ('*' | '/' | '%') unaryExpr
+multiplicativeExpr
+    : unaryExpr
+    | multiplicativeExpr ('*' | '/' | '%') unaryExpr  // Multiplicativ expr recursiv
     ;
 
-unaryExpr 
-    : primaryExpr 
+unaryExpr
+    : primaryExpr
     | ('+' | '-' | '!') primaryExpr
     ;
 
-primaryExpr 
-    : NUMBER 
-    | BOOLEAN 
-    | STRING 
-    | IDENTIFIER 
+primaryExpr
+    : NUMBER
+    | BOOLEAN
+    | STRING
+    | IDENTIFIER
     | '(' expr ')'
     ;
 
